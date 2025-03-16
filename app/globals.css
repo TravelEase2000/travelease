@@ -1,0 +1,302 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Fix for Leaflet map markers */
+.leaflet-div-icon {
+  background: transparent;
+  border: none;
+}
+
+/* Fix for Leaflet map container */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+/* Neon effects for dark mode */
+.dark .neon-text {
+  text-shadow: 0 0 5px theme("colors.blue.400"), 0 0 10px theme("colors.blue.400"), 0 0 15px theme("colors.blue.400"), 0
+    0 20px theme("colors.blue.500"), 0 0 35px theme("colors.blue.500"), 0 0 40px theme("colors.blue.500");
+}
+
+.dark .neon-border {
+  box-shadow: 0 0 5px theme("colors.blue.400"), 0 0 10px theme("colors.blue.400"), 0 0 15px theme("colors.blue.500");
+}
+
+.dark .neon-button {
+  box-shadow: 0 0 5px theme("colors.blue.400"), 0 0 10px theme("colors.blue.400");
+  text-shadow: 0 0 5px theme("colors.blue.400");
+  transition: all 0.3s ease;
+}
+
+.dark .neon-button:hover {
+  box-shadow: 0 0 5px theme("colors.blue.400"), 0 0 10px theme("colors.blue.400"), 0 0 15px theme("colors.blue.400"), 0
+    0 20px theme("colors.blue.500");
+  text-shadow: 0 0 5px theme("colors.blue.400"), 0 0 10px theme("colors.blue.400");
+}
+
+/* Animated gradient background for dark mode */
+.dark .gradient-bg {
+  background: linear-gradient(45deg, #0f172a, #1e293b, #0f172a);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Animated train track for loading states */
+.train-track {
+  position: relative;
+  height: 4px;
+  background: repeating-linear-gradient(
+    90deg,
+    theme("colors.gray.300"),
+    theme("colors.gray.300") 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  overflow: hidden;
+}
+
+.dark .train-track {
+  background: repeating-linear-gradient(
+    90deg,
+    theme("colors.gray.700"),
+    theme("colors.gray.700") 10px,
+    transparent 10px,
+    transparent 20px
+  );
+}
+
+.train {
+  position: absolute;
+  width: 40px;
+  height: 10px;
+  background-color: theme("colors.blue.500");
+  border-radius: 4px;
+  top: -3px;
+  animation: train-move 2s linear infinite;
+}
+
+.dark .train {
+  background-color: theme("colors.blue.400");
+  box-shadow: 0 0 10px theme("colors.blue.400");
+}
+
+@keyframes train-move {
+  0% {
+    left: -40px;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Pulse animation for buttons and interactive elements */
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Smooth transitions */
+.page-transition {
+  transition: all 0.3s ease-in-out;
+}
+
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Custom animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Glass effect */
+.glass {
+  @apply bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-secondary/50;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/50 rounded-full hover:bg-primary/70 transition-colors;
+}
+
+/* Loading skeleton */
+.skeleton {
+  @apply animate-pulse bg-gray-200 dark:bg-gray-800 rounded-lg;
+}
+
+/* Card hover effects */
+.hover-card {
+  @apply transition-all duration-300 hover:shadow-lg hover:scale-[1.02] dark:hover:shadow-primary/20;
+}
+
+/* Button animations */
+.btn-bounce {
+  @apply transition-transform active:scale-95;
+}
+
+/* Form inputs */
+.input-highlight {
+  @apply focus:ring-2 focus:ring-primary/50 dark:focus:ring-primary/30;
+}
+
+/* Navigation active states */
+.nav-link-active {
+  @apply text-primary font-medium;
+}
+
+/* Dark mode image adjustments */
+.dark img {
+  @apply brightness-90;
+}
+
+@layer utilities {
+  .subtle-glow {
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+  }
+
+  .dark .dark-heading {
+    @apply text-white/90 subtle-glow;
+  }
+
+  .dark .dark-card {
+    @apply bg-gray-900/60 backdrop-blur-sm border-gray-800;
+  }
+
+  .dark .dark-hover {
+    @apply hover:bg-gray-800/50 transition-colors;
+  }
+
+  .gradient-bg {
+    background: linear-gradient(to bottom right, rgba(13, 16, 45, 0.7), rgba(29, 35, 84, 0.7));
+  }
+}
+
