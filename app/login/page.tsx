@@ -11,8 +11,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Eye, EyeOff, Mail, Lock } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
-import { signIn } from "@/lib/firebase"
+import { toast } from "sonner"
+import { signIn, resendVerificationEmail } from "@/lib/firebase"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 
@@ -21,8 +21,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [needsVerification, setNeedsVerification] = useState(false)
   const router = useRouter()
-  const { toast } = useToast()
   const { theme } = useTheme()
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -33,25 +33,34 @@ export default function LoginPage() {
       const result = await signIn(email, password)
 
       if (result.success) {
-        toast({
-          title: "Login successful",
-          description: "Welcome back to TravelEase!",
-        })
-
+        toast.success("Welcome back to TravelEase!")
         router.push("/")
       } else {
-        toast({
-          title: "Login failed",
-          description: result.error || "Please check your credentials and try again.",
-          variant: "destructive",
-        })
+        if (result.needsVerification) {
+          setNeedsVerification(true)
+          toast.error("Please verify your email before signing in")
+        } else {
+          toast.error(result.error || "Please check your credentials and try again.")
+        }
       }
     } catch (error: any) {
-      toast({
-        title: "Login failed",
-        description: error.message || "An unexpected error occurred.",
-        variant: "destructive",
-      })
+      toast.error(error.message || "An unexpected error occurred.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleResendVerification = async () => {
+    setIsLoading(true)
+    try {
+      const result = await resendVerificationEmail()
+      if (result.success) {
+        toast.success("Verification email sent! Please check your inbox.")
+      } else {
+        toast.error(result.error || "Failed to send verification email")
+      }
+    } catch (error) {
+      toast.error("An error occurred while sending verification email")
     } finally {
       setIsLoading(false)
     }
@@ -94,7 +103,7 @@ export default function LoginPage() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
                 <Link
-                  href="/forgot-password"
+                  href="/reset-password"
                   className={cn("text-sm text-primary hover:underline", theme === "dark" ? "neon-text" : "")}
                 >
                   Forgot password?
@@ -134,6 +143,23 @@ export default function LoginPage() {
                 Remember me
               </Label>
             </div>
+
+            {needsVerification && (
+              <div className="text-center space-y-2">
+                <p className="text-sm text-yellow-600 dark:text-yellow-500">
+                  Please verify your email before signing in.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleResendVerification}
+                  disabled={isLoading}
+                  className="w-full"
+                >
+                  {isLoading ? "Sending..." : "Resend Verification Email"}
+                </Button>
+              </div>
+            )}
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-4">

@@ -6,6 +6,11 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  applyActionCode,
+  verifyPasswordResetCode,
+  confirmPasswordReset,
 } from "firebase/auth"
 import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, query, where, getDocs } from "firebase/firestore"
 import { getStorage } from "firebase/storage"
@@ -37,6 +42,9 @@ export async function signUp(email: string, password: string, name: string) {
       displayName: name,
     })
 
+    // Send email verification
+    await sendEmailVerification(user)
+
     // Create user document in Firestore
     await setDoc(doc(db, "users", user.uid), {
       uid: user.uid,
@@ -45,6 +53,7 @@ export async function signUp(email: string, password: string, name: string) {
       isStudent: email.endsWith(".edu") || email.endsWith(".ac.in"),
       createdAt: new Date().toISOString(),
       bookings: [],
+      emailVerified: false,
     })
 
     return { success: true, user }
@@ -56,7 +65,75 @@ export async function signUp(email: string, password: string, name: string) {
 export async function signIn(email: string, password: string) {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password)
-    return { success: true, user: userCredential.user }
+    const user = userCredential.user
+
+    // Check if email is verified
+    if (!user.emailVerified) {
+      return { 
+        success: false, 
+        error: "Please verify your email before signing in",
+        needsVerification: true 
+      }
+    }
+
+    return { success: true, user }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
+}
+
+export async function resendVerificationEmail() {
+  try {
+    const user = auth.currentUser
+    if (!user) throw new Error("No user is currently signed in")
+    
+    await sendEmailVerification(user)
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
+}
+
+export async function verifyEmail(actionCode: string) {
+  try {
+    await applyActionCode(auth, actionCode)
+    
+    // Update user's emailVerified status in Firestore
+    const user = auth.currentUser
+    if (user) {
+      await updateDoc(doc(db, "users", user.uid), {
+        emailVerified: true
+      })
+    }
+    
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
+}
+
+export async function sendPasswordReset(email: string) {
+  try {
+    await sendPasswordResetEmail(auth, email)
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
+}
+
+export async function verifyPasswordResetCode(code: string) {
+  try {
+    await verifyPasswordResetCode(auth, code)
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
+}
+
+export async function confirmPasswordReset(code: string, newPassword: string) {
+  try {
+    await confirmPasswordReset(auth, code, newPassword)
+    return { success: true }
   } catch (error: any) {
     return { success: false, error: error.message }
   }
