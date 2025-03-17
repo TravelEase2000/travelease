@@ -9,8 +9,8 @@ import {
   sendEmailVerification,
   sendPasswordResetEmail,
   applyActionCode,
-  verifyPasswordResetCode,
-  confirmPasswordReset,
+  verifyPasswordResetCode as verifyResetCode,
+  confirmPasswordReset as confirmReset,
 } from "firebase/auth"
 import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, query, where, getDocs } from "firebase/firestore"
 import { getStorage } from "firebase/storage"
@@ -123,8 +123,8 @@ export async function sendPasswordReset(email: string) {
 
 export async function verifyPasswordResetCode(code: string) {
   try {
-    await verifyPasswordResetCode(auth, code)
-    return { success: true }
+    const email = await verifyResetCode(auth, code)
+    return { success: true, email }
   } catch (error: any) {
     return { success: false, error: error.message }
   }
@@ -132,7 +132,7 @@ export async function verifyPasswordResetCode(code: string) {
 
 export async function confirmPasswordReset(code: string, newPassword: string) {
   try {
-    await confirmPasswordReset(auth, code, newPassword)
+    await confirmReset(auth, code, newPassword)
     return { success: true }
   } catch (error: any) {
     return { success: false, error: error.message }
