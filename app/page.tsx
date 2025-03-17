@@ -5,46 +5,54 @@ import FeaturesSection from "@/components/features-section"
 import TestimonialsSection from "@/components/testimonials-section"
 import { cn } from "@/lib/utils"
 import { metadata } from './metadata'
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
 
 export { metadata }
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-[600px] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70 z-10" />
-        <div
-          className="absolute inset-0 bg-cover bg-center z-0"
-          style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1540103711724-ebf833bde8d1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80')",
-          }}
-        />
-        <div className="container relative z-20 h-full flex flex-col justify-center items-start text-white">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 dark:text-white/90">
-            Book Train Tickets <br />
-            with Ease
-          </h1>
-          <p className="text-lg md:text-xl mb-8 max-w-xl text-white/90">
-            The simplest way for students to book train tickets, track journeys, and explore destinations across India.
-          </p>
-          <div className="flex gap-4">
-            <Link
-              href="#booking"
-              className={cn(
-                "bg-white text-primary hover:bg-white/90 px-6 py-3 rounded-lg font-medium flex items-center gap-2",
-                "dark:bg-white/10 dark:text-white dark:border dark:border-white/20 dark:hover:bg-white/20",
-              )}
-            >
-              <Search size={18} />
-              Search Trains
+      <section className="bg-primary text-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              Travel with Ease and Comfort
+            </h1>
+            <p className="text-lg md:text-xl mb-8">
+              Book train tickets, plan your journey, and explore India with our seamless booking platform.
+            </p>
+            <Link href="/search">
+              <Button size="lg" variant="secondary">
+                Book Now
+              </Button>
             </Link>
-            <Link
-              href="/about"
-              className="bg-transparent border border-white/20 hover:bg-white/10 px-6 py-3 rounded-lg font-medium transition-colors"
-            >
-              Learn More
+          </div>
+        </div>
+      </section>
+
+      {/* Train Image Section */}
+      <section className="relative h-[500px] w-full">
+        <Image
+          src="/train-background.jpg"
+          alt="Indian Railway Train"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+          <div className="text-center text-white p-6 max-w-3xl">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Experience the Joy of Train Travel
+            </h2>
+            <p className="text-lg md:text-xl mb-6">
+              Discover the beauty of India through its extensive rail network. Safe, comfortable, and memorable journeys await you.
+            </p>
+            <Link href="/about">
+              <Button variant="outline" className="text-white border-white hover:bg-white hover:text-primary">
+                Learn More
+              </Button>
             </Link>
           </div>
         </div>

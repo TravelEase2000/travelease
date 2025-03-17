@@ -1,19 +1,19 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
-/.pnp
+node_modules
+.pnp
 .pnp.js
 
 # testing
-/coverage
+coverage
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build
 
 # misc
 .DS_Store
@@ -28,6 +28,7 @@ yarn-error.log*
 .env*.local
 .env
 .env.development
+.env.test
 .env.production
 
 # vercel
@@ -37,8 +38,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# sensitive files
+# firebase
 firebaseConfig.json
-**/firebase-config.*
-**/firebase-credentials.*
-**/firebase-service-account.*
+firebase-admin.json
+**/firebase-adminsdk-*.json

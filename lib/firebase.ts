@@ -11,6 +11,8 @@ import {
   applyActionCode,
   verifyPasswordResetCode as verifyResetCode,
   confirmPasswordReset as confirmReset,
+  onAuthStateChanged,
+  User,
 } from "firebase/auth"
 import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, query, where, getDocs } from "firebase/firestore"
 import { getStorage } from "firebase/storage"
@@ -42,9 +44,6 @@ export async function signUp(email: string, password: string, name: string) {
       displayName: name,
     })
 
-    // Send email verification
-    await sendEmailVerification(user)
-
     // Create user document in Firestore
     await setDoc(doc(db, "users", user.uid), {
       uid: user.uid,
@@ -55,6 +54,13 @@ export async function signUp(email: string, password: string, name: string) {
       bookings: [],
       emailVerified: false,
     })
+
+    // Send email verification
+    const actionCodeSettings = {
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/verify-email`,
+      handleCodeInApp: true,
+    }
+    await sendEmailVerification(user, actionCodeSettings)
 
     return { success: true, user }
   } catch (error: any) {
@@ -67,27 +73,45 @@ export async function signIn(email: string, password: string) {
     const userCredential = await signInWithEmailAndPassword(auth, email, password)
     const user = userCredential.user
 
+    // Get user data from Firestore
+    const userDoc = await getDoc(doc(db, "users", user.uid))
+    const userData = userDoc.data()
+
     // Check if email is verified
     if (!user.emailVerified) {
       return { 
         success: false, 
         error: "Please verify your email before signing in",
-        needsVerification: true 
+        needsVerification: true,
+        email: user.email 
       }
     }
 
-    return { success: true, user }
+    return { success: true, user, userData }
   } catch (error: any) {
     return { success: false, error: error.message }
   }
 }
 
-export async function resendVerificationEmail() {
+export async function resendVerificationEmail(email?: string) {
   try {
-    const user = auth.currentUser
-    if (!user) throw new Error("No user is currently signed in")
+    let user = auth.currentUser
     
-    await sendEmailVerification(user)
+    // If no current user but email provided, try to sign in
+    if (!user && email) {
+      const userCredential = await signInWithEmailAndPassword(auth, email, "dummy-password").catch(() => null)
+      if (userCredential) {
+        user = userCredential.user
+      }
+    }
+    
+    if (!user) throw new Error("No user found")
+    
+    const actionCodeSettings = {
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/verify-email`,
+      handleCodeInApp: true,
+    }
+    await sendEmailVerification(user, actionCodeSettings)
     return { success: true }
   } catch (error: any) {
     return { success: false, error: error.message }
@@ -114,7 +138,11 @@ export async function verifyEmail(actionCode: string) {
 
 export async function sendPasswordReset(email: string) {
   try {
-    await sendPasswordResetEmail(auth, email)
+    const actionCodeSettings = {
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password`,
+      handleCodeInApp: true,
+    }
+    await sendPasswordResetEmail(auth, email, actionCodeSettings)
     return { success: true }
   } catch (error: any) {
     return { success: false, error: error.message }
@@ -146,6 +174,11 @@ export async function logOut() {
   } catch (error: any) {
     return { success: false, error: error.message }
   }
+}
+
+// Auth state observer
+export const onAuthStateChange = (callback: (user: User | null) => void) => {
+  return onAuthStateChanged(auth, callback)
 }
 
 // User data functions
